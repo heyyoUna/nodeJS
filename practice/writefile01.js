@@ -1,4 +1,5 @@
 const fs = require('fs');
+const path = require('path');
 
 const data = {
     name: 'David',
@@ -6,7 +7,7 @@ const data = {
 }
 
 fs.writeFile(
-    'data.json',    //檔案名
+    './data.json',    //檔案名
     JSON.stringify(data, null, 4),  //轉換為json 字串 
     error => {  //call back function
         if(error) {
@@ -15,5 +16,5 @@ fs.writeFile(
         }
     console.log('寫入成功');
 });
-
+//執行後，會自動生成data該檔案
 //https://nodejs.org/api/fs.html#fs_filehandle_writefile_data_options
