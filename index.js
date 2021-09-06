@@ -1,9 +1,9 @@
-require('dotenv').config(); //載入.env的設定
+require('dotenv').config(); //載入.env的設定 //configuration 設定檔
 const express = require('express');  //這是套件安裝進來的，所以不是給路徑
 
-const app = express(); 
+const app = express(); //app: application server
 
-app.use(express.static('public'));  //在啟動的工作目錄(根目錄)，就會出現此資料夾(靜態內容｀)
+app.use(express.static('public'));  //將含有靜態資產的目錄名稱傳遞給 express.static 中介軟體函數，就能直接開始提供檔案。
 
 //路由方法：GET method route
 //路由定義開始 :BEGIN

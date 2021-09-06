@@ -1,10 +1,11 @@
 const http = require('http');
-const fs = require('fs');
+const fs = require('fs'); //file system
 
 const server = http.createServer((req, res) => {    
+    //非同步讀取
     fs.writeFile(
-        __dirname + '/./header.txt',
-        JSON.stringify(req.headers, null, 4), 
+        __dirname + '/./header.txt', //生成該txt檔案，匯出request 的header
+        JSON.stringify(req.headers),  //將物件轉變為 JSON 字串
         error => {
             if(error){
                 res.end(`<h1>錯誤:${error}</h1>`);
