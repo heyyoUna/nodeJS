@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        new Promise((resolve, reject) => {  //建構函式的傳的值，有兩個function: 有值就跑resolve, 失敗就reject 
+            setTimeout(() => {
+                resolve('abc'); //如果要跑多的，可用陣列
+                // reject('my-error');
+            }, 1000);
+        }).then(r=>{        //call back function
+            console.log('2:', r, new Date());
+            throw new Error('your error message');  //自訂一個錯誤物件
+
+        }).catch(err=>{ 
+            console.log('error:', err);
+        })  
+
+        console.log('1:', new Date());
+
+
+    </script>
+</body>
+</html>

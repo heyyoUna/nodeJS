@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css">
+
+</head>
+<body>
+<div class="container">
+    <form name="fake_form" onsubmit="return false">
+        <img src="" alt="" width="300px" id="img01">
+        <button type="button" class="btn btn-success" onclick="avatar.click()">上傳大頭貼</button>
+
+        <div class="mb-3">
+            <label for="my_img" class="form-label">image</label>
+            <input type="text" class="form-control" id="my_img" name="my_img">
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+<!-- 上傳大頭貼 -->
+    <form name="form1" style="display: none">
+        <input type="file" id="avatar" name="avatar">
+    </form>
+</div>
+
+
+
+
+<script>
+    const avatar = document.querySelector('#avatar');
+
+
+ //看到照片時，已經是上傳後了，不像是前端的預覽
+ //很容易有垃圾檔，很多上傳後又沒有使用的照片   
+    avatar.addEventListener('change', async event=>{
+    //如果上傳大頭貼的form區域有變更內容，直接上傳
+        const fd = new FormData(document.form1);
+        const res = await fetch('/try-upload2', {
+            method: 'POST',
+            body: fd
+        });
+
+    //回應的結果(fetch 通常接兩個then，所以這邊有兩個await)
+        const obj = await res.json();
+        document.querySelector('#img01').src = '/img/' + obj.filename;
+        document.fake_form.my_img.value = obj.filename;
+    });
+
+
+</script>
+</body>
+</html>

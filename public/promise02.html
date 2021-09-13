@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        new Promise((resolve, reject) => { 
+            const rnd = 300 + Math.floor(Math.random() * 1000);
+            setTimeout(() => {
+                resolve(rnd); 
+            }, rnd);
+        }).then(r=>{        //如果很多的then都還是會被執行
+            console.log('2:', r);
+            return new Promise((resolve, reject) => {
+            const rnd = 300 + Math.floor(Math.random()*1000);
+            setTimeout(() => {
+                resolve(rnd);
+            }, rnd);
+        });
+
+        //return的值，會進到下一個then
+        }).then(r => {
+            console.log('3:', r);
+        }).catch(err => {
+            console.log('error:', err);
+        })
+
+
+    </script>
+</body>
+</html>

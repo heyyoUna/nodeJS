@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+/*
+兩個個別的async，就不！會！在第一組跑完，才會跑第二組。兩組會交錯。只能確保每組的順序是從上而下。如果要兩組照順序，要把第二組包在第一組的then內。
+
+為啥不繼續用promise? 如果有100項，就要寫100次promise個別執行！累死XDD
+
+*/
+    function myPromise(p) {
+        return new Promise((resolve, reject) => {
+            const rnd = 300 + Math.floor(Math.random()*1000);
+            setTimeout(() => {
+                resolve({p, rnd});
+            }, rnd);
+        });
+    }
+
+
+//如果async要用箭頭函式，需要把包起來，直接呼叫
+    (async ()=>{
+        const str = 'say-hello---';
+        for(let i=0; i< str.length; i++){
+            console.log(await myPromise(str[i]));
+        }
+    })();
+
+    (async ()=>{
+        const r1 = await myPromise('bill');
+        console.log(r1);
+        const r2 = await myPromise('peter');
+        console.log(r2);
+        const r3 = await myPromise('david');
+        console.log(r3);
+        const r4 = await myPromise('aaron');
+        console.log(r4);
+    })();
+
+
+
+</script>
+
+</body>
+</html>
