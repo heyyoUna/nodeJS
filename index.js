@@ -4,10 +4,15 @@ require('dotenv').config(); //載入.env的設定 //configuration 設定檔
 const express = require('express');  //套件安裝進來的，所以不是給路徑
 const multer = require('multer'); 
 const fs = require('fs').promises; //file system
+const cors = require('cors');
 const session = require('express-session');
+const MysqlStore = require('express-mysql-session')(session);
 const moment = require('moment-timezone');
 const upload = multer({dest: 'tmp_uploads/'}); //設定上傳暫存目錄
 const uploadImg = require('./modules/upload-images');
+// const mysql = require('mysql2');
+const db = require('./modules/connect-mysql');
+const sessionStore = new MysqlStore({}, db);
 
 const app = express(); 
 
@@ -15,41 +20,64 @@ const app = express();
 app.set('view engine', 'ejs');
 
 app.use(session ({
+    name: 'mySessionId',
     saveUninitialized: false,   //如果session還沒初始化，是否儲存
     resave: false,  //強制回存
     //以上兩個預設值，目前是false，但後續可能改為true，所以會建議使用者先加
 
+    store: sessionStore,
     secret: '34908-948dfgkpw;wkhoej;rjrpwn;;krot',  //亂數
     cookie: {
         maxAge : 1200000, //20min(單位毫秒)；如果不給，預設為視窗關掉才過期 
     }
 }));
 
+const corsOptions = {
+    credentials: true,
+    origin: (origin, cb)=>{
+        console.log(`origin: ${origin}`);
+        cb(null, true);
+    }
+};
+app.use( cors(corsOptions) );
+
     // const urlencodedParser = express.urlencoded({extended: false});
     // const jsonParser = express.json(); 
 app.use(express.urlencoded({extended: false})); //提升到頂層top middleware，所有要過去的人，都會經過
+
 app.use(express.json());
 app.use(express.static('public'));  //將含有靜態資產的目錄名稱傳遞給 express.static 中介軟體函數，就能直接開始提供檔案。
 app.use('/jquery', express.static('./node_modules/jquery/dist'));
 app.use('/bootstrap', express.static('./node_modules/bootstrap/dist'));
 
+// 自訂的middleware
 app.use((req, res, next) => {
-    res.locals.title ='小新的網站';  //判斷變數有沒有傳過來
+    res.locals.title ='按讚訂閱分享開啟小鈴鐺';  //判斷變數有沒有傳過來
+    res.locals.pageName = '';
+    res.locals.keyword = '';
     // res.send('middleware'); //middleware不可使用res.，跑完此行就會結束
+
+
+    // 設定 template 的 helper functions
+res.locals.dateToDateString = d => moment(d).format('YYYY-MM-DD'); 
+res.locals.dateToDateTimeString = d => moment(d).format('YYYY-MM-DD HH:mm:ss');
+    
+
     next(); 
 });
 
 
+
 //路由定義開始 :BEGIN
 app.get('/', (req, res) => {          //此處的get，是http的方法；括號內是處理器
+    res.locals.title = '首頁 - ' + res.locals.title;
     res.render('home', {name: 'Una'});     //對應views資料夾的home檔案，前面是檔名(不加副檔名)
     // res.send(`<h1>Hello World from file Index.js</h1>`)        //send會將字串視為html
 }); 
 
-res.locals.title = '首頁 - ' + res.locals.title;
-res.render('home', {name: 'Una'});
 
-app.get('/json-sales', (req, res) => {     
+app.get('/json-sales', (req, res) => {   
+    res.locals.pageName = 'json-sales';
     const sales = require('./data/sales');     //載入後會把jaon內容轉化成原生的array/object納入
     // console.log(sales); 
     //http://localhost:3001/json-sales 確認連結
@@ -151,9 +179,9 @@ app.get('/try-moment', (req, res)=>{
 });
 
 app.get('/try-db', async (req, res)=>{
-    const [r] = await db.query("SELECT * FROM address_book WHERE `name` LIKE ?", ['%新%']);
+    const [r] = await db.query("SELECT * FROM address_book_0814 WHERE `name` LIKE ?", ['%也%']); 
 
-    res.json(r);
+    res.json(r); 
 
 });
 

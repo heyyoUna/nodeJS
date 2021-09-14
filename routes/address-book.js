@@ -23,26 +23,28 @@ async function getListData(req, res){
     }
 
 
-    const t_sql = `SELECT COUNT(1) totalRows FROM address_book ${where}`;
+    const t_sql = `SELECT COUNT(1) totalRows FROM address_book_0814 ${where}`;
     const [[{totalRows}]] = await db.query(t_sql);
     output.totalRows = totalRows;
-    output.totalPages = Math.ceil(totalRows/perPage);
+    output.totalPages = Math.ceil(totalRows/perPage); //算出總頁數
     output.perPage = perPage;
     output.rows = [];
     output.page = page;
 
     // 如果有資料才去取得分頁的資料
-    if(totalRows > 0){
+    if(totalRows > 0){  //拿到總比數
         if(page < 1){
             output.redirect = '?page=1';
             return output;
         }
+
+    // 依據用戶指定的範圍，拿到該分頁的資料
         if(page > output.totalPages){
             output.redirect = '?page=' + output.totalPages;
             return output;
         }
 
-        const sql = `SELECT * FROM \`address_book\` ${where} ORDER BY sid DESC LIMIT ${(page-1)*perPage}, ${perPage}`;
+        const sql = `SELECT * FROM \`address_book_0814\` ${where} ORDER BY sid DESC LIMIT ${(page-1)*perPage}, ${perPage}`;
         const [rows] = await db.query(sql)
         output.rows = rows;
 
@@ -54,7 +56,8 @@ router.get('/', (req, res)=>{
     res.render('address-book/main');
 });
 
-router.get('/list', async (req, res)=>{
+
+router.get('/list', async (req, res)=>{     //撈資料庫
     res.locals.pageName = 'ab-list';
 
     const output = await getListData(req, res);
@@ -71,7 +74,7 @@ router.get('/api/list', async (req, res)=>{
 
 
 router.delete('/delete/:sid([0-9]+)', async (req, res)=>{
-    const sql = "DELETE FROM address_book WHERE sid=?";
+    const sql = "DELETE FROM address_book_0814 WHERE sid=?";
 
     const [r] = await db.query(sql, [req.params.sid]);
     console.log({r});
@@ -89,7 +92,7 @@ router.route('/add')
             success: false,
         }
 
-        // const sql = "INSERT INTO `address_book`(" +
+        // const sql = "INSERT INTO `address_book_0814`(" +
         //     "`name`, `email`, `mobile`, `birthday`, `address`, `created_at`) VALUES (?, ?, ?, ?, ?, NOW())";
         //
         // const [result] = await db.query(sql, [
@@ -101,7 +104,7 @@ router.route('/add')
         // ]);
 
         const input = {...req.body, created_at: new Date()};
-        const sql = "INSERT INTO `address_book` SET ?";
+        const sql = "INSERT INTO `address_book_0814` SET ?";
         let result = {};
         // 處理新增資料時可能的錯誤
         try {
@@ -134,7 +137,7 @@ router.route('/add')
 
 router.route('/edit/:sid')
     .get(async (req, res)=>{
-        const sql = "SELECT * FROM address_book WHERE sid=?";
+        const sql = "SELECT * FROM address_book_0814 WHERE sid=?";
         const [rs] = await db.query(sql, [req.params.sid]);
 
         if(rs.length){
@@ -151,7 +154,7 @@ router.route('/edit/:sid')
         }
 
         const input = {...req.body};
-        const sql = "UPDATE `address_book` SET ? WHERE sid=?";
+        const sql = "UPDATE `address_book_0814` SET ? WHERE sid=?";
         let result = {};
         // 處理修改資料時可能的錯誤
         try {
